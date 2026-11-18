@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+# C# build output / Visual Studio state
+csharp/.vs/
+csharp/**/bin/
+csharp/**/obj/
+# generated from the Hotone software's data (not included, see README): tools/gen_alg_names.py
+arduino/*/AlgNames.h
+# value display tables extracted from the Hotone software (tools/extract_valtostr.py)
+tools/data/

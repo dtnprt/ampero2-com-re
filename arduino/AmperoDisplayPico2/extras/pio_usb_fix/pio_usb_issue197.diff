@@ -1,0 +1,31 @@
+diff --git a/a_pio_usb.c b/b_pio_usb.c
+index fb376a2..59a5916 100644
+--- a/a_pio_usb.c
++++ b/b_pio_usb.c
+@@ -98,15 +98,23 @@ void __not_in_flash_func(pio_usb_bus_usb_transfer)(pio_port_t *pp,
+   }
+   pp->pio_usb_tx->irq = IRQ_TX_ALL_MASK; // clear complete flag
+ 
++  // AmperoDisplay patch (Pico-PIO-USB issue #197/#203): polling the TX state machine's PC can miss
++  // the short window in which it is in range and then spins forever (core hangs after minutes of
++  // traffic). Same wait as before, but bounded: at most ~2 bit times worth of loop iterations
++  // (each iteration takes several CPU cycles, so the bound is roughly 8 bit times). Normally the
++  // PC condition ends the loop much earlier, so the timing towards the device is unchanged.
++  // 1 bit time = 4 * TX clock divider CPU cycles (120 MHz full speed: divider 2.5 -> 10 cycles).
++  const pio_clk_div_t div = pp->low_speed ? pp->clk_div_ls_tx : pp->clk_div_fs_tx;
++  const uint32_t bit_cycles = ((4u * (((uint32_t)div.div_int << 8) | div.div_frac)) + 255u) >> 8;
++  uint32_t guard = 2u * bit_cycles;
+   if (pp->low_speed) {
+     // For Low speed host, wait until EOP is fully sent. Otherwise, we can send another packet
+     // before inter-packet delay timeout, which is 2-bit time by USB specs.
+-    // For Full speed, our overhead is probably enough without this additional wait.
+-    while (*pc <= PIO_USB_TX_ENCODED_DATA_COMP) {
++    while (*pc <= PIO_USB_TX_ENCODED_DATA_COMP && --guard) {
+       continue;
+     }
+   } else {
+-    while (*pc < PIO_USB_TX_ENCODED_DATA_COMP) {
++    while (*pc < PIO_USB_TX_ENCODED_DATA_COMP && --guard) {
+       continue;
+     }
+   }

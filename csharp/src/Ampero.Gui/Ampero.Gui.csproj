@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ampero.Protocol\Ampero.Protocol.csproj" />
+    <ProjectReference Include="..\Ampero.Midi\Ampero.Midi.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>AmperoRemote</AssemblyName>
+  </PropertyGroup>
+
+  <!-- effect names/parameters from the Hotone editor installation, copied next to the exe if present -->
+  <PropertyGroup>
+    <!-- effect database of the Hotone editor (not included in the repository); copied next to the exe if present -->
+    <AlgDataJson>$(MSBuildThisFileDirectory)..\..\..\..\private\windows\windows software\data\flutter_assets\assets\data\v1.0.9_alg_data.json</AlgDataJson>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(AlgDataJson)')">
+    <None Include="$(AlgDataJson)" Link="v1.0.9_alg_data.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
