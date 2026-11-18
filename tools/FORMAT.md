@@ -445,7 +445,7 @@ Die Gruppe 0x0007 hat im get ein eigenes Layout: [0] EXP/CTRL Function, [5] Glob
 | | 0x0008000d | Stomp Mode | 0 Footswitch, 1 Effect Chain |
 | | 0x00080006 | Color | 0–6 (7 Farben) |
 | | 0x00080007 | Display Time | 0 Always On, 1 1 Min, 2 5 Min, 3 10 Min, 4 20 Min, 5 30 Min, 6 40 Min, 7 50 Min, 8 60 Min |
-| Metronom | 0x000a0001 / 0x000a0002 / 0x000a0003 / 0x000a0004 | an/aus / Volume / BPM (`u16`) / Style | |
+| Drum / Metronom | 0x000a0001 Sync, 0x000a0002 Volume (0–100), 0x000a0003 BPM (40–300, set `u16`), 0x000a0004 Rhythmus (0–99), 0x000a0005 Play | set je 1 Byte (BPM 2 Byte, Dart `setGlobalControlValue(…, lenght: 2)`); get `0x000a0000` = [0] Sync, [1] Volume, [2..3] u16 BPM, [4] Rhythmus, [5] Play, [6..7] ? (am Pedal: `00 26 78 00 05 00 01 81` = Sync aus, 38, 120 BPM, „6. Metro 6/4“). Namen: Dart-Liste `drumName` (100 Einträge, „Metro 1/4“ … „11/8 Beat“). Set noch nicht mitgeschnitten |
 
 **Footswitch-Funktionscodes** (Preset Tag 3 `click`/`hold`, CTRL-Schalter, PATCH FS FUNC; aus `HTBaseDefine.kFSMapFunc`
 der App, verifiziert an PATCH FS FUNC und den Presets):
