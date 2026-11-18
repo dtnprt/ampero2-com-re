@@ -538,6 +538,24 @@ Index = `exp * 4 + target`. Kategorie und Algorithmus stehen nicht im Preset, si
 Beim Wechsel des Parameters setzt das Pedal den Bereich auf 0–100 zurück (Ziel 1 im Export: Sustain 0–100).
 OFF (Export `data/A98-1-MIDI-Test 1.prst`): pos = `FF`, param = `FF`, Bereich 0–100, Line, Auto-OFF aus.
 
+### 6.10 Split- und Mix-Knoten verschieben [verifiziert am Mitschnitt `captures/wine-split-mix-nodes-2026-11-18.txt` + Screenshots]
+
+Der Hotone-Editor schickt beim Verschieben immer beide Positionen nacheinander: `0x01050005` `u32 split`, dann
+`0x01050006` `u32 mix` (0–6 = vor Position k der oberen Reihe, 6 = Ende; `FFFFFFFF` = kein Knoten). Das Pedal
+antwortet mit dem Routing-Push `0x0105000b` (`i16 inputSource[2], i16 outputSource[2], u8 split, u8 mix, 2 Byte`)
+und passt dabei die Ein-/Ausgangsquellen selbst an.
+
+| Vorlage | gesehen (split, mix) |
+|---|---|
+| Split → Mix | (0,6) (2,6) (2,4) (2,3) (3,4) (3,5) (4,5) (0,3) – immer split < mix, auch direkt benachbart |
+| Y → A/B | (3,FF) (4,FF) |
+| Serial | (3,FF) → Pedal macht daraus einen Y-Split (in1 = None, out1 = None); (6,FF) → wieder Serial |
+| A/B → Y | nicht verschoben |
+
+Im selben Mitschnitt: `0x01050007` `u32 mode` (Split-Modus), `0x01050009` `u32 index, f32 wert` (Split-Parameter:
+Level To A/B …), `0x0105000a` `u32 index, f32 wert` (Mixer: A Level, A Pan, B Level, B Pan, B Polarity, Master,
+Master SUM).
+
 ## 7. Offene Punkte
 
 * Tag 8 (`ctrlTargetSlot`) am Gerät bestätigen: dazu nach einer Footswitch-Änderung das Preset
